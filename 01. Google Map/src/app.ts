@@ -1,13 +1,35 @@
-// form이 null이 아니라는 것을 확실하게 하기 위해서 ! 타입 붙여줌
+import axios from 'axios';
+
 const form = document.querySelector('form')!;
-// Type Casting (value access 해결!)
 const addressInput = document.getElementById('address')! as HTMLInputElement;
+
+const GOOGLE_API_KEY = "AIzaSyBMUBvHgQqtDmrteQpJAHuCViaVcjwLs8s'";
+
+type GoogleGeocodingResponse = {
+  results: { geometry: { location: { lat: number; lng: number } } }[];
+  status: 'OK' | 'ZERO_RESULTS';
+};
 
 function searchAddressHandler(event: Event) {
   event.preventDefault();
-  // addressInput.value가 무엇을 갖고오는지 모르기떄문에 Type Error 발생
   const enteredAddress = addressInput.value;
-  // send this to Google's API
+
+  axios
+    .get<GoogleGeocodingResponse>(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURI(
+        enteredAddress
+      )}&key=${GOOGLE_API_KEY}`
+    )
+    .then((response) => {
+      if (response.data.status !== 'OK') {
+        throw new Error('Could not fetch location!');
+      }
+      const coordinates = response.data.results[0].geometry.location;
+    })
+    .catch((err) => {
+      alert(err.message);
+      console.log(err);
+    });
 }
 
 form.addEventListener('submit', searchAddressHandler);
