@@ -15,11 +15,17 @@ const App: React.FC = () => {
       { id: Math.random().toString(), text: text },
     ]);
   };
+
+  const todoDeleteHandler = (id: string) => {
+    setTodos((prevTodos) => {
+      return prevTodos.filter((prevTodo) => prevTodo.id !== id);
+    });
+  };
   return (
     <div className='App'>
       {/* 함수를 실행시키는게 아닌, 함수를 가리키는 포인터를 onAddTodo에 전달! */}
       <NewTodo onAddTodo={todoAddHandler} />
-      <TodoList items={todos} />
+      <TodoList items={todos} onDeleteTodo={todoDeleteHandler} />
     </div>
   );
 };
